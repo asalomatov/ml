@@ -24,7 +24,7 @@ def split_data(df, targ_clm, train_perc=0.7, rand_state=212):
 
     return([X_trn.reset_index(drop=True), X_vld.reset_index(drop=True)])
 
-def insert_folds(df, targ_clm, k_folds=5):
+def create_folds(df, targ_clm, k_folds=5):
     """After abhishekkrthakur/approachingalmost"""
     df = df.sample(frac=1).reset_index(drop=True)
     df["kfold"] = -1
@@ -64,4 +64,4 @@ if __name__ == "__main__":
                                                 'tested_negative': 0})
     l = split_data(df, 'class')
 
-    df_trn = insert_fold(l[0], 'class')
+    df_trn = create_folds(l[0], 'class')
