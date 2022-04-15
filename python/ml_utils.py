@@ -29,8 +29,32 @@ def create_folds(df, targ_clm, k_folds=5):
     df = df.sample(frac=1).reset_index(drop=True)
     df["kfold"] = -1
     # initiate the kfold class from model_selection module
-    kf = model_selection.StratifiedKFold(n_splits=k_folds, )
+    kf = model_selection.StratifiedKFold(n_splits=k_folds)
     for fold, (trn_, val_) in enumerate(kf.split(X=df, y=df[targ_clm])):
+        df.loc[val_, 'kfold'] = fold
+    return(df)
+
+def create_group_folds(df, targ_clm, group_clm, k_folds=5):
+    """After abhishekkrthakur/approachingalmost"""
+    df = df.sample(frac=1).reset_index(drop=True)
+    df["kfold"] = -1
+    # initiate the kfold class from model_selection module
+    kf = model_selection.GroupKFold(n_splits=k_folds)
+    for fold, (trn_, val_) in enumerate(kf.split(df,
+                                            df[targ_clm],
+                                            df[group_clm])):
+        df.loc[val_, 'kfold'] = fold
+    return(df)
+
+def create_logo_folds(df, targ_clm, group_clm, k_folds=5):
+    """After abhishekkrthakur/approachingalmost"""
+    df = df.sample(frac=1).reset_index(drop=True)
+    df["kfold"] = -1
+    # initiate the kfold class from model_selection module
+    kf = model_selection.LeaveOneGroupOut()
+    for fold, (trn_, val_) in enumerate(kf.split(df,
+                                            df[targ_clm],
+                                            df[group_clm])):
         df.loc[val_, 'kfold'] = fold
     return(df)
 
