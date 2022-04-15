@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from sklearn import model_selection
 
 def split_data(df, targ_clm, train_perc=0.7, rand_state=212):
@@ -23,8 +24,31 @@ def split_data(df, targ_clm, train_perc=0.7, rand_state=212):
 
     return([X_trn.reset_index(drop=True), X_vld.reset_index(drop=True)])
 
-    def save_asdf():
-        """Save output split_data to dataframes"""
+def insert_fold(df, targ_clm, k_folds=5):
+    """After abhishekkrthakur/approachingalmost"""
+    df = df.sample(frac=1).reset_index(drop=True)
+    df["kfold"] = -1
+    # initiate the kfold class from model_selection module
+    kf = model_selection.StratifiedKFold(n_splits=k_folds, )
+    for fold, (trn_, val_) in enumerate(kf.split(X=df, y=df[targ_clm])):
+        df.loc[val_, 'kfold'] = fold
+    return(df)
+
+def create_folds_regr(df, targ_clm, k_folds=5):
+    """After abhishekkrthakur/approachingalmost"""
+    df["kfold"] = -1
+    df = df.sample(frac=1).reset_index(drop=True)
+    # calculate the number of bins by Sturge's rule
+    num_bins = int(np.floor(1 + np.log2(len(df))))
+    # bin targets
+    df.loc[:, "bins"] = pd.cut(df[targ_clm], bins=num_bins, labels=False)
+    kf = model_selection.StratifiedKFold(n_splits=k_folds)
+    for f, (t_, v_) in enumerate(kf.split(X=df, y=df.bins.values)):
+        df.loc[v_, 'kfold'] = f
+    df = df.drop("bins", axis=1)
+    return(df)
+
+
 if __name__ == "__main__":
     from sklearn.datasets import make_classification
     X, y = make_classification(n_samples=1000, n_features=100)
@@ -39,3 +63,5 @@ if __name__ == "__main__":
     df.loc[:, 'class'] = df.loc[:, 'class'].map({'tested_positive': 1,
                                                 'tested_negative': 0})
     l = split_data(df, 'class')
+
+    df_trn = insert_fold(l[0], 'class')
