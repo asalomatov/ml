@@ -1,3 +1,4 @@
+from os import pread
 import pandas as pd
 import numpy as np
 from sklearn import model_selection
@@ -73,7 +74,7 @@ def create_folds_regr(df, targ_clm, k_folds=5):
     df = df.drop("bins", axis=1)
     return(df)
 
-def binary_classification_metrics(y_true, y_pred, y_prob=None):
+def binary_classification_metrics(y_true, y_pred, y_prob=None, decimals=2):
     """ y_true - true labels
         y_pred - predicted labels
         y_prob - predicted probs"""
@@ -87,21 +88,22 @@ def binary_classification_metrics(y_true, y_pred, y_prob=None):
     res = pd.DataFrame({
         'Prevalence': [P/(P + N)],
         'Sensitivity': [TP/P], # recall, TPR
-        'Sensitivity_skl': [metrics.recall_score(y_true, y_pred)],
+        # 'Sensitivity_skl': [metrics.recall_score(y_true, y_pred)],
         'Specificity': [TN/N],
         'Accuracy': [(TP + TN)/(P + N)],
-        'Accuracy_skl': [metrics.accuracy_score(y_true, y_pred)],
+        # 'Accuracy_skl': [metrics.accuracy_score(y_true, y_pred)],
         'Precision': [TP/(TP + FP)], # also known as PPV
-        'Precision_skl': [metrics.precision_score(y_true, y_pred)],
+        # 'Precision_skl': [metrics.precision_score(y_true, y_pred)],
         'F1': [2*TP/(2*TP + FP + FN)],
-        'F1_skl': [metrics.f1_score],
+        # 'F1_skl': [metrics.f1_score(y_true, y_pred)],
         'FPR': [FP/N], # 1 - specificity
         'MCC': [(TP * TN - FP * FN)/((TP + FP) * (FN + TN) * (FP + TN) * (TP + FN))**0.5],
-        'MCC_skl': [metrics.metrics.matthews_corrcoef]
+        # 'MCC_skl': [metrics.matthews_corrcoef(y_true, y_pred)]
     })
     if y_prob is not None:
         res['AUC'] = metrics.roc_auc_score(y_true, y_prob)
         res['LogLoss'] = metrics.log_loss(y_true, y_prob)
+    res = res.round(decimals=decimals)
     return(res)
 
 def feature_clms(df_clms, targ_clm):
@@ -117,21 +119,25 @@ if __name__ == "__main__":
     df.loc[:, 'targ'] = y
     l = split_data(df, 'targ')
 
-    from sklearn.datasets import fetch_openml
+    # from sklearn.datasets import fetch_openml # this is innconsistent
     # diabetes dataset from openML
-    diab = fetch_openml(data_id=37)
-    df = diab.frame
-    df.loc[:, 'class'] = df.loc[:, 'class'].map({'tested_positive': 1,
-                                                'tested_negative': 0})
-    df_trn, dr_val = split_data(df, 'class')
+    # diab = fetch_openml(data_id=37)
+    # df = diab.frame
+    # df.loc[:, 'class'] = df.loc[:, 'class'].map({'tested_positive': 1,
+    #                                            'tested_negative': 0})
+
+    # download from kaggle https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database/download
+    df = pd.read_csv('~/Downloads/diabetes.csv')
+    df_trn, df_val = split_data(df, 'Outcome', train_perc=0.8)
     from sklearn.linear_model import LogisticRegression
 
+    ftr_clms = feature_clms(df_trn.columns, 'Outcome')
     clf = LogisticRegression(random_state=212).fit(
-        df_trn[feature_clms(df_trn.columns, 'class')],
-        df_trn['class'])
-    y_pred = clf.predict(df_trn[feature_clms(df_trn.columns, 'class')])
-    y_prob = clf.predict_proba(df_trn[feature_clms(df_trn.columns, 'class')])
-    print(binary_classification_metrics(df_val['class'], y_pred))
-    print(binary_classification_metrics(df_val['class'], y_pred, y_prob=y_prob))
+        df_trn[ftr_clms],
+        df_trn['Outcome'])
+    y_pred = clf.predict(df_val[ftr_clms])
+    y_prob = clf.predict_proba(df_val[ftr_clms])[: , 1]
+    print(binary_classification_metrics(df_val['Outcome'], y_pred).T)
+    print(binary_classification_metrics(df_val['Outcome'], y_pred, y_prob=y_prob).T)
 
-    df_trn = create_folds(l[0], 'class')
+    df_trn = create_folds(df_trn, 'Outcome')
