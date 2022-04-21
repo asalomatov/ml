@@ -11,8 +11,8 @@ RAND_STATE=212
 models = {
     
     "logistic_regr_cls": LogisticRegression(),
-    "svm_sls": SVC(probability=True, random_state=RAND_STATE),
-    "svm_sls": NuSVC(probability=True, random_state=RAND_STATE),
+    "svm_cls": SVC(probability=True, random_state=RAND_STATE),
+    "nusvm_cls": NuSVC(probability=True, random_state=RAND_STATE),
     "decision_tree_cls_gini": DecisionTreeClassifier(criterion="gini", random_state=RAND_STATE ),
     "decision_tree_cls_entropy": DecisionTreeClassifier( criterion="entropy", random_state=RAND_STATE),
     "random_forest_cls": RandomForestClassifier(random_state=RAND_STATE),
