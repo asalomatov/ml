@@ -33,6 +33,7 @@ models = {
                                         random_state=RAND_STATE, 
                                         seed=RAND_STATE,
                                         n_jobs=-1,
+                                        use_label_encoder=False,
                                         eval_metric="auc"
                                     ),
 
