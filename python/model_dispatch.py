@@ -12,7 +12,7 @@ models = {
     
     "logistic_regr_cls": LogisticRegression(),
     "svm_cls": SVC(probability=True, random_state=RAND_STATE),
-    "nusvm_cls": NuSVC(probability=True, random_state=RAND_STATE),
+    "nusvm_cls": NuSVC(nu=.1, probability=True, random_state=RAND_STATE),
     "decision_tree_cls_gini": DecisionTreeClassifier(criterion="gini", random_state=RAND_STATE ),
     "decision_tree_cls_entropy": DecisionTreeClassifier( criterion="entropy", random_state=RAND_STATE),
     "random_forest_cls": RandomForestClassifier(random_state=RAND_STATE),
@@ -21,7 +21,7 @@ models = {
     "xgboost_cls": xgb.XGBClassifier(
                                         objective="binary:logistic",
                                         eta=0.1,
-                                        max_depth=3,
+                                        max_depth=6,
                                         gamma=1,
                                         alpha=1,
                                        #lambda=?,

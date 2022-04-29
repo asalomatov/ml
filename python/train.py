@@ -39,10 +39,11 @@ def run(fold, model, targ_clm=config.TARG_CLM):
         perf_metrics = binary_classification_metrics(y_valid, preds, pred_prob) 
 
     perf_metrics.insert(0, 'fold', fold)
-    print(perf_metrics)
+    # print(perf_metrics)
     # save the model
     joblib.dump( clf,
-        os.path.join(config.MODEL_OUTPUT, f"dt_{fold}.bin") )
+        os.path.join(config.MODEL_OUTPUT, config.PREFIX + "_" + model + f"_{fold}.bin") )
+    return(perf_metrics)
 
 if __name__ == "__main__":
 
@@ -51,4 +52,9 @@ if __name__ == "__main__":
     parser.add_argument( "--model", type=str )
     args = parser.parse_args()
     
-    run( fold=args.fold, model=args.model )
+    l = []
+    for f in range(5):
+        l.append(run( fold=f, model=args.model ))
+    metr_df = pd.concat(l)
+    print(metr_df)
+    print(metr_df.AUC.mean())
