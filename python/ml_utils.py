@@ -106,6 +106,24 @@ def binary_classification_metrics(y_true, y_pred, y_prob=None, decimals=2):
     res = res.round(decimals=decimals)
     return(res)
 
+def multiclass_classification_metrics(y_true, y_pred, y_prob=None,
+                                    avrg='macro', decimals=2):
+    """ y_true - true labels
+        y_pred - predicted labels
+        y_prob - predicted probs"""
+    res = pd.DataFrame({
+        'Sensitivity': [metrics.recall_score(y_true, y_pred, average=avrg)],
+        'Accuracy': [metrics.accuracy_score(y_true, y_pred)],
+        'Precision': [metrics.average_precision_score(y_true, y_pred, average=avrg)],
+        'F1': [metrics.f1_score(y_true, y_pred, average=avrg)],
+    })
+    if y_prob is not None:
+        res['AUC'] = metrics.roc_auc_score(y_true, y_prob, average=avrg)
+        # res['LogLoss'] = metrics.log_loss(y_true, y_prob)
+    res = res.round(decimals=decimals)
+    return(res)
+
+
 def feature_clms(df_clms, targ_clm):
     """return list of feature columns"""
     res = [i for i in df_clms if i != targ_clm]
