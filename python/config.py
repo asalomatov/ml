@@ -17,17 +17,17 @@ MODEL_OUTPUT = "../models/"
 # TRAINING_FILE = "../input/%s_train_folds.csv" % PREFIX 
 # VALIDATION_FILE = "../input/%s_validate.csv" % PREFIX 
 
-# PREFIX = "sbPCR_2010Nature_DLfeatures"
-# INPUT_DATA = "../input/2010Nature_DLfeatures.csv"
-# TARG_CLM = "lbl"
-# TRAINING_FILE = "../input/%s_train_folds.csv" % PREFIX 
-# VALIDATION_FILE = "../input/%s_validate.csv" % PREFIX 
-
-PREFIX = "sbPCR_2010Nature.features"
-INPUT_DATA = "../input/2010_nature.features.csv"
+PREFIX = "sbPCR_2010Nature_DLfeatures"
+INPUT_DATA = "../input/2010Nature_DLfeatures.csv"
 TARG_CLM = "lbl"
 TRAINING_FILE = "../input/%s_train_folds.csv" % PREFIX 
 VALIDATION_FILE = "../input/%s_validate.csv" % PREFIX 
+
+# PREFIX = "sbPCR_2010Nature.features"
+# INPUT_DATA = "../input/2010_nature.features.csv"
+# TARG_CLM = "lbl"
+# TRAINING_FILE = "../input/%s_train_folds.csv" % PREFIX 
+# VALIDATION_FILE = "../input/%s_validate.csv" % PREFIX 
 
 # PREFIX = "HU_IA_DLfeatures"
 # INPUT_DATA = "../input/HU_IA_DLfeatures.csv"
