@@ -106,6 +106,14 @@ def binary_classification_metrics(y_true, y_pred, y_prob=None, decimals=2):
     res = res.round(decimals=decimals)
     return(res)
 
+def roc_curve(y_true, y_prob):
+    fpr, tpr, thresholds = metrics.roc_curve(y_true, y_prob)
+    res = pd.DataFrame({'fpr': fpr,
+                        'tpr': tpr,
+                        'thesholds': thresholds
+                        })
+    return(res)
+
 def feature_clms(df_clms, targ_clm):
     """return list of feature columns"""
     res = [i for i in df_clms if i != targ_clm]
@@ -127,7 +135,7 @@ if __name__ == "__main__":
     #                                            'tested_negative': 0})
 
     # download from kaggle https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database/download
-    df = pd.read_csv('~/Downloads/diabetes.csv')
+    df = pd.read_csv('../input/diabetes.csv')
     df_trn, df_val = split_data(df, 'Outcome', train_perc=0.8)
     from sklearn.linear_model import LogisticRegression
 
