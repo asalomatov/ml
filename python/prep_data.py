@@ -11,8 +11,8 @@ df = pd.read_csv(config.INPUT_DATA)
 # to-do
 
 # split
-df_trn, df_val = ml_utils.split_data(df, config.TARG_CLM, train_perc=0.75)
-df_trn = ml_utils.create_folds(df_trn, config.TARG_CLM, k_folds=5)
+df_trn, df_val = ml_utils.split_data(df, config.TARG_CLM, train_perc=0.9)
+df_trn = ml_utils.create_folds(df_trn, config.TARG_CLM, k_folds=10)
 
 # mkdir -p
 general_utils.run_in_shell("mkdir -p " + config.MODEL_OUTPUT)
