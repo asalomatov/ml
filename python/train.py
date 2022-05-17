@@ -26,13 +26,13 @@ def run(fold, model, targ_clm=config.TARG_CLM):
     # target is label column in the dataframe
     x_train = df_train.drop([config.TARG_CLM, 'kfold'], axis=1)[config.FEATURE_SET].values 
     x_train = scaler.fit_transform(x_train)
-    pca = transformer.fit(x_train)
-    x_train = pca.transform(x_train)
+    # pca = transformer.fit(x_train)
+    # x_train = pca.transform(x_train)
     y_train = df_train[config.TARG_CLM].values
     # similarly, for validation, we have
     x_valid = df_valid.drop([config.TARG_CLM, 'kfold'], axis=1)[config.FEATURE_SET].values 
     x_valid = scaler.fit_transform(x_valid)
-    x_valid = pca.transform(x_valid)
+    # x_valid = pca.transform(x_valid)
     y_valid = df_valid[config.TARG_CLM].values
     clf = model_dispatch.models[model]
     # fir the model on training data
