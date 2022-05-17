@@ -10,6 +10,8 @@ import model_dispatch
 from ml_utils import binary_classification_metrics
 from ml_utils import roc_curve
 from matplotlib import pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import KernelPCA
 
 
 def run(fold, model, targ_clm=config.TARG_CLM):
@@ -17,13 +19,20 @@ def run(fold, model, targ_clm=config.TARG_CLM):
     df = pd.read_csv(config.TRAINING_FILE)
     df_train = df[df.kfold != fold].reset_index(drop=True)
     df_valid = df[df.kfold == fold].reset_index(drop=True) 
+    scaler = StandardScaler()
+    transformer = KernelPCA(n_components=config.PCA_COMPONENTS, kernel=config.PCA_KERNEL)
     # drop the label column from dataframe and convert it to
     # a numpy array by using .values.
     # target is label column in the dataframe
-    x_train = df_train.drop([config.TARG_CLM, 'kfold'], axis=1).values 
+    x_train = df_train.drop([config.TARG_CLM, 'kfold'], axis=1)[config.FEATURE_SET].values 
+    x_train = scaler.fit_transform(x_train)
+    pca = transformer.fit(x_train)
+    x_train = pca.transform(x_train)
     y_train = df_train[config.TARG_CLM].values
     # similarly, for validation, we have
-    x_valid = df_valid.drop([config.TARG_CLM, 'kfold'], axis=1).values 
+    x_valid = df_valid.drop([config.TARG_CLM, 'kfold'], axis=1)[config.FEATURE_SET].values 
+    x_valid = scaler.fit_transform(x_valid)
+    x_valid = pca.transform(x_valid)
     y_valid = df_valid[config.TARG_CLM].values
     clf = model_dispatch.models[model]
     # fir the model on training data
@@ -62,7 +71,7 @@ if __name__ == "__main__":
     tprs = []
     l = []
     l_roc = []
-    for f in range(5):
+    for f in range(10):
         metr, roc_crv = run( fold=f, model=args.model )
         tprs.append(np.interp(mean_fpr, roc_crv.fpr, roc_crv.tpr))
         tprs[-1][0] = 0.0
@@ -90,9 +99,10 @@ if __name__ == "__main__":
     plt.ylim([-0.01, 1.01])
     plt.xlabel('False Positive Rate',fontsize=18)
     plt.ylabel('True Positive Rate',fontsize=18)
-    plt.title('CYS reactivity prediction\nCross-Validation ROC, DL features, 2010 Nature data', fontsize=18)
+    plt.title('CYS reactivity prediction\nCross-Validation ROC, %s, 2010 Nature data' % config.PLT_TITLE,
+                fontsize=18)
     plt.legend(loc="lower right", prop={'size': 15})
-    plt.savefig(os.path.join(config.MODEL_OUTPUT, args.model + '_roc.png'), bbox_inches = "tight")
+    plt.savefig(os.path.join(config.MODEL_OUTPUT, args.model + '_' + config.PLT_TITLE + '_roc.png'), bbox_inches = "tight")
     plt.show()
     print(metr_df)
     print(metr_df.AUC.mean())
